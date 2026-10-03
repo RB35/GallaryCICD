@@ -24,5 +24,13 @@ pipeline {
                 }
             }
         }
+
+        stage('Security') {
+            steps {
+                dir('api') {
+                    bat 'snyk code test --org=ec34bc94-cbae-4c21-88a5-45255637b01e --report'
+                }
+            }
+        }
     }
 }
