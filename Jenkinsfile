@@ -13,7 +13,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 dir('api') {
-                    withSonarQubeEnv('SonarQube') {
+                    withSonarQubeEnv('SonarQube Cloud') {
                         bat '''
                             npx sonar-scanner \
                             -Dsonar.organization=rb35 \
