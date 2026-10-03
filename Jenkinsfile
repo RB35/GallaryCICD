@@ -5,7 +5,7 @@ pipeline {
         stage('Install') {
             steps {
                 dir('api') {
-                    bat 'npm ci'
+                    bat 'pnpm ci'
                 }
             }
         }
