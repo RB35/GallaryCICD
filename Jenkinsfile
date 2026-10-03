@@ -27,10 +27,12 @@ pipeline {
 
         stage('Security') {
             steps {
-                snykSecurity(
-                snykInstallation: 'snyk@latest',
-                snykTokenId: 'snyk-api-token',
-                )
+                dir('api') {
+                    snykSecurity(
+                    snykInstallation: 'snyk@latest',
+                    snykTokenId: 'snyk-api-token',
+                    )
+                }
             }
         }
     }
