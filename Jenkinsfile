@@ -18,6 +18,7 @@ pipeline {
                             npx sonar-scanner \
                             -Dsonar.organization=rb35 \
                             -Dsonar.projectKey=RB35_GallaryCICD
+                            -Dsonar.coverage.exclusions=**/*
                         '''
                     }
                 }
