@@ -17,7 +17,7 @@ pipeline {
                         bat '''
                             npx sonar-scanner \
                             -Dsonar.organization=rb35 \
-                            -Dsonar.projectKey=RB35_GallaryCICD
+                            -Dsonar.projectKey=RB35_GallaryCICD \
                             -Dsonar.coverage.exclusions=**/*
                         '''
                     }
