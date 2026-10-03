@@ -4,18 +4,22 @@ pipeline {
     stages {
         stage('Install') {
             steps {
-                sh 'npm ci'
+                dir('api') {
+                    bat 'npm ci'
+                }
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        npx sonar-scanner \
-                          -Dsonar.organization=rb35 \
-                          -Dsonar.projectKey=RB35_GallaryCICD
-                    '''
+                dir('api') {
+                    withSonarQubeEnv('SonarQube') {
+                        bat '''
+                            npx sonar-scanner \
+                            -Dsonar.organization=rb35 \
+                            -Dsonar.projectKey=RB35_GallaryCICD
+                        '''
+                    }
                 }
             }
         }
