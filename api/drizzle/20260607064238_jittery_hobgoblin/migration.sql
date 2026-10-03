@@ -1,0 +1,1 @@
+ALTER TABLE "artwork" ADD COLUMN "onDisplay" boolean DEFAULT false NOT NULL;

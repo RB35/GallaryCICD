@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "createdDate" timestamp NOT NULL;

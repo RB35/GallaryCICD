@@ -1,0 +1,1 @@
+ALTER TABLE "lands" ALTER COLUMN "polygon" SET DATA TYPE geometry(Polygon,4326) USING "polygon"::geometry(Polygon,4326);

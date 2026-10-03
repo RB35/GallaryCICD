@@ -1,0 +1,1 @@
+ALTER TABLE "artwork" RENAME COLUMN "addedBy" TO "managedBy";
