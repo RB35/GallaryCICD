@@ -1,6 +1,7 @@
 import fp from "fastify-plugin";
 import { FastifyInstance } from "fastify";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pg from "pg";
 
 
@@ -21,6 +22,7 @@ declare module "fastify" {
 
 export default fp(
     async (fastify: FastifyInstance) => {
+        console.log(fastify.config.DATABASE_URL)
         //Create pg connection
         const pool = new pg.Pool({
             connectionString: fastify.config.DATABASE_URL,
@@ -29,6 +31,10 @@ export default fp(
 
         //Start drizzle
         const db = drizzle({ client: pool });
+
+        await migrate(db, {
+            migrationsFolder: "./drizzle",
+        });
 
         //Create the repos using the created drizzle object and inject them into fastify
         fastify.decorate("artworkRepo", createArtworkRepository(db));
