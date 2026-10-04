@@ -6,6 +6,7 @@ services:
     environment:
       NODE_ENV: test
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/testdb
+      JWT_SECRET: myVerySuperSecretCode103847637832
     depends_on:
       postgres:
         condition: service_healthy
