@@ -1,0 +1,38 @@
+services:
+  api:
+    image: ${IMAGE}
+    ports:
+      - "8000:8000"
+    environment:
+      NODE_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/testdb
+      JWT_SECRET: myVerySuperSecretCode103847637832
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'node -e "require(''http'').get(''http://localhost:8000/api'', (res) => process.exit(res.statusCode === 200 ? 0 : 1))"',
+        ]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+      start_period: 10s
+
+  postgres:
+    image: postgis/postgis:18-3.6
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: testdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./dump.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d testdb"]
+      interval: 2s
+      timeout: 5s
+      retries: 10

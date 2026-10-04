@@ -82,6 +82,11 @@ pipeline {
                         reportFiles: 'report.html',
                         reportName: 'Newman Integration Test Report'
                     ])
+
+                    dir('testing') {
+                        echo 'Removing testing enviroment docker contaniers'
+                        bat 'docker-compose -p "%COMPOSE_PROJECT_NAME%" -f docker-compose.test.yml down -v --remove-orphans'
+                    }
                 }
             }
         }
