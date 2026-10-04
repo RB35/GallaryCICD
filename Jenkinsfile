@@ -63,39 +63,10 @@ pipeline {
 
         stage('Start Intergration Test Environment') {
             steps {
-                dir("testing"){
-                powershell '''
-                    docker compose -p $env:COMPOSE_PROJECT_NAME `
-                        -f docker-compose.test.yml `
-                        up -d
-
-                    if ($LASTEXITCODE -ne 0) {
-                        throw "Failed to start Docker Compose"
-                    }
-
-                    Write-Host "Waiting for API..."
-
-                    for ($i = 1; $i -le 30; $i++) {
-                        try {
-                            $response = Invoke-WebRequest `
-                                -Uri "http://localhost:3000/api/health" `
-                                -UseBasicParsing `
-                                -TimeoutSec 2
-
-                            if ($response.StatusCode -eq 200) {
-                                Write-Host "API is ready!"
-                                exit 0
-                            }
-                        }
-                        catch {
-                            Write-Host "API not ready yet..."
-                        }
-
-                        Start-Sleep -Seconds 2
-                    }
-
-                    throw "API failed to start"
-                '''
+                dir('testing') {
+                    bat '''
+                    docker compose -p "%COMPOSE_PROJECT_NAME%" -f docker-compose.test.yml up -d
+                    '''
                 }
             }
         }
