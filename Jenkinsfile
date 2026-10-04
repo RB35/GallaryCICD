@@ -1,11 +1,24 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE = "gallery-api:${BUILD_NUMBER}"
+        COMPOSE_PROJECT_NAME = "jenkins-${BUILD_NUMBER}"
+    }
+
     stages {
         stage('Install') {
             steps {
                 dir('api') {
                     bat 'pnpm ci'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('api') {
+                    bat "docker build -t ${IMAGE} ."
                 }
             }
         }
