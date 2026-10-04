@@ -36,7 +36,7 @@ pipeline {
 
                 dir('api') {
                     echo 'Checking pnpm audit for known vulnerabilities...'
-                    bat 'pnpm audit --audit-level=moderate'c
+                    bat 'pnpm audit --audit-level=moderate'
 
                     echo 'Running snyk code security scanner...'
                     snykSecurity(
