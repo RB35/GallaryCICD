@@ -65,5 +65,25 @@ pipeline {
                 }
             }
         }
+
+        stage('Run intergration tests') {
+            steps{
+                dir('testing'){
+                    bat '''newman run test.postman_collection.json -r htmlextra --reporter-htmlextra-export ./report.html'''
+                }
+            }
+            post {
+                always {
+                    publishHTML(target: [
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'testing',
+                        reportFiles: 'report.html',
+                        reportName: 'Newman Integration Test Report'
+                    ])
+                }
+            }
+        }
     }
 }

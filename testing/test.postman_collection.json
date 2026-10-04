@@ -1,0 +1,1652 @@
+{
+  "info": {
+    "_postman_id": "628e609a-d59a-4344-afff-61ff7afacc47",
+    "name": "Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "18678961",
+    "_collection_link": "https://go.postman.co/collection/18678961-628e609a-d59a-4344-afff-61ff7afacc47?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Authenticate as admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n    pm.response.to.have.jsonBody();\r\n    pm.response.to.not.be.null;\r\n    pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains an JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains a token\", function () {\r\n    var responseJson = pm.response.json();\r\n    pm.expect(responseJson).to.have.property('token');\r\n});\r\n\r\npm.collectionVariables.set(\"admin_auth_token\", pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"{{admin_email}}\",\r\n    \"password\": \"{{admin_password}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/auth",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "auth"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all users",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON array\", function () {\r\n pm.expect(pm.response.json()).to.be.an('array');\r\n});\r\n\r\npm.test(\"All users have correct feilds\", function(){\r\n    var users = pm.response.json();\r\n    var valid = users.every(user =>\r\n        user.hasOwnProperty(\"id\") &&\r\n        user.hasOwnProperty(\"email\") &&\r\n        user.hasOwnProperty(\"firstName\") &&\r\n        user.hasOwnProperty(\"lastName\") &&\r\n        user.hasOwnProperty(\"role\") &&\r\n        user.hasOwnProperty(\"createdDate\")\r\n    );\r\n    pm.expect(valid).to.be.true;\r\n});\r\n\r\npm.collectionVariables.set(\"original_user_count\", pm.response.json().length);\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Creates Staff member",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is CREATED\", function () {\r\n pm.response.to.have.status(201);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains an JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains the newly created user\", function () {\r\n var user = pm.response.json();\r\n pm.expect(user).to.have.property('id');\r\n pm.expect(user).to.have.property('firstName');\r\n pm.expect(user).to.have.property('lastName');\r\n pm.expect(user).to.have.property('email');\r\n pm.expect(user).to.have.property('role');\r\n pm.expect(user).to.have.property('createdDate');\r\n});\r\n\r\npm.collectionVariables.set(\"new_staff_id\", pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstName\": \"James\",\r\n    \"lastName\": \"M\",\r\n    \"email\": \"{{new_staff_email}}\",\r\n    \"password\": \"{{new_staff_password}}\",\r\n    \"role\": \"staff\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Authenticate as staff",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n    pm.response.to.have.jsonBody();\r\n    pm.response.to.not.be.null;\r\n    pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains an JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains a token\", function () {\r\n    var responseJson = pm.response.json();\r\n    pm.expect(responseJson).to.have.property('token');\r\n});\r\n\r\npm.collectionVariables.set(\"staff_auth_token\", pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"{{new_staff_email}}\",\r\n    \"password\": \"{{new_staff_password}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/auth",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "auth"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Staff tries to create another staff",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is Forbidden\", function () {\r\n pm.response.to.have.status(403);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstName\": \"James\",\r\n    \"lastName\": \"M\",\r\n    \"email\": \"{{new_staff_email}}\",\r\n    \"password\": \"{{new_staff_password}}\",\r\n    \"role\": \"staff\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Member registration",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is CREATED\", function () {\r\n pm.response.to.have.status(201);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains an JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains the newly created user\", function () {\r\n var user = pm.response.json();\r\n pm.expect(user).to.have.property('id');\r\n pm.expect(user).to.have.property('firstName');\r\n pm.expect(user).to.have.property('lastName');\r\n pm.expect(user).to.have.property('email');\r\n pm.expect(user).to.have.property('role');\r\n pm.expect(user).to.have.property('createdDate');\r\n});\r\n\r\npm.collectionVariables.set(\"new_member_id\", pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstName\": \"Robert\",\r\n    \"lastName\": \"F\",\r\n    \"email\": \"{{new_member_email}}\",\r\n    \"password\": \"{{new_member_password}}\",\r\n    \"role\": \"member\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get the details of the newly created member",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains the newly created user\", function () {\r\n var user = pm.response.json();\r\n pm.expect(user).to.have.property('id');\r\n pm.expect(user).to.have.property('firstName');\r\n pm.expect(user).to.have.property('lastName');\r\n pm.expect(user).to.have.property('email');\r\n pm.expect(user).to.have.property('role');\r\n pm.expect(user).to.have.property('createdDate');\r\n});\r\n\r\npm.test(\"Response id matches the id that was requested\", function(){\r\n    var user = pm.response.json();\r\n    pm.expect(user.id).to.equal(pm.variables.get(\"new_member_id\"));\r\n});\r\n\r\n\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users/{{new_member_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users",
+            "{{new_member_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Curator registration",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is CREATED\", function () {\r\n pm.response.to.have.status(201);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains an JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains the newly created user\", function () {\r\n var user = pm.response.json();\r\n pm.expect(user).to.have.property('id');\r\n pm.expect(user).to.have.property('firstName');\r\n pm.expect(user).to.have.property('lastName');\r\n pm.expect(user).to.have.property('email');\r\n pm.expect(user).to.have.property('role');\r\n pm.expect(user).to.have.property('createdDate');\r\n});\r\n\r\npm.collectionVariables.set(\"new_curator_id\", pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstName\": \"Maddy\",\r\n    \"lastName\": \"S\",\r\n    \"email\": \"{{new_curator_email}}\",\r\n    \"password\": \"{{new_curator_password}}\",\r\n    \"role\": \"curator\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all users",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON array\", function () {\r\n pm.expect(pm.response.json()).to.be.an('array');\r\n});\r\n\r\npm.test(\"All users have correct feilds\", function(){\r\n    var users = pm.response.json();\r\n    var valid = users.every(user =>\r\n        user.hasOwnProperty(\"id\") &&\r\n        user.hasOwnProperty(\"email\") &&\r\n        user.hasOwnProperty(\"firstName\") &&\r\n        user.hasOwnProperty(\"lastName\") &&\r\n        user.hasOwnProperty(\"role\") &&\r\n        user.hasOwnProperty(\"createdDate\")\r\n    );\r\n    pm.expect(valid).to.be.true;\r\n});\r\n\r\npm.test(\"User count reflects the newly added users\", function () {\r\n    pm.expect(pm.response.json().length).to.equal(pm.collectionVariables.get(\"original_user_count\") + 3);\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Change members password",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains an JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains the expected user information\", function () {\r\n var user = pm.response.json();\r\n pm.expect(user).to.have.property('id');\r\n pm.expect(user).to.have.property('firstName');\r\n pm.expect(user).to.have.property('lastName');\r\n pm.expect(user).to.have.property('email');\r\n pm.expect(user).to.have.property('role');\r\n pm.expect(user).to.have.property('createdDate');\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"password\": \"{{updated_member_password}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users/{{new_member_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users",
+            "{{new_member_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Authenticate as member",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n    pm.response.to.have.jsonBody();\r\n    pm.response.to.not.be.null;\r\n    pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains an JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains a token\", function () {\r\n    var responseJson = pm.response.json();\r\n    pm.expect(responseJson).to.have.property('token');\r\n});\r\n\r\npm.collectionVariables.set(\"member_auth_token\", pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"{{new_member_email}}\",\r\n    \"password\": \"{{updated_member_password}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/auth",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "auth"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Authenticate as curator",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n    pm.response.to.have.jsonBody();\r\n    pm.response.to.not.be.null;\r\n    pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains an JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains a token\", function () {\r\n    var responseJson = pm.response.json();\r\n    pm.expect(responseJson).to.have.property('token');\r\n});\r\n\r\npm.collectionVariables.set(\"curator_auth_token\", pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"{{new_curator_email}}\",\r\n    \"password\": \"{{new_curator_password}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/auth",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "auth"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all artworks",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON array\", function () {\r\n pm.expect(pm.response.json()).to.be.an('array');\r\n});\r\n\r\npm.collectionVariables.set(\"original_art_count\", pm.response.json().length);\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{member_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/artworks",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "artworks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Curator add new artwork",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is CREATED\", function () {\r\n pm.response.to.have.status(201);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains the newly created artwork\", function () {\r\n var user = pm.response.json();\r\n pm.expect(user).to.have.property('id');\r\n pm.expect(user).to.have.property('title');\r\n pm.expect(user).to.have.property('creator');\r\n pm.expect(user).to.have.property('description');\r\n pm.expect(user).to.have.property('imageUrl');\r\n pm.expect(user).to.have.property('media');\r\n pm.expect(user).to.have.property('onDisplay');\r\n pm.expect(user).to.have.property('managedBy');\r\n});\r\n\r\npm.collectionVariables.set(\"new_art_id\", pm.response.json().id);\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{curator_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"Artwork 1\",\r\n    \"creator\": \"Artist\",\r\n    \"description\": \"Example description\",\r\n    \"imageUrl\": \"www.mycdn.com/images/artwork1\",\r\n    \"media\": \"Canvas\",\r\n    \"onDisplay\": true,\r\n    \"managedBy\": {{new_curator_id}}\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/artworks",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "artworks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get new artwork",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response id matches the id that was requested\", function(){\r\n    var user = pm.response.json();\r\n    pm.expect(user.id).to.equal(pm.variables.get(\"new_art_id\"));\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{member_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/artworks/{{new_art_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "artworks",
+            "{{new_art_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Admin changes artwork name",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains the newly created artwork\", function () {\r\n var user = pm.response.json();\r\n pm.expect(user).to.have.property('id');\r\n pm.expect(user).to.have.property('title');\r\n pm.expect(user).to.have.property('creator');\r\n pm.expect(user).to.have.property('description');\r\n pm.expect(user).to.have.property('imageUrl');\r\n pm.expect(user).to.have.property('media');\r\n pm.expect(user).to.have.property('onDisplay');\r\n pm.expect(user).to.have.property('managedBy');\r\n});\r\n\r\npm.test(\"Ensure returned name matches the new artwork name\", function () {\r\n    var artwork = pm.response.json();\r\n    pm.expect(artwork.title).to.eql(pm.variables.get(\"updated_art_name\"));\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"{{updated_art_name}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/artworks/{{new_art_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "artworks",
+            "{{new_art_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all artworks after changes",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON array\", function () {\r\n pm.expect(pm.response.json()).to.be.an('array');\r\n});\r\n\r\npm.test(\"Response retuns the correct number of artworks after adding one more\", function () {\r\n    pm.expect(pm.response.json().length).to.equal(pm.collectionVariables.get(\"original_art_count\") + 1);\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{member_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/artworks",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "artworks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete the created artwork",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 204\", function () {\r\n    pm.expect(pm.response.code).to.eql(204);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{curator_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/artworks/{{new_art_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "artworks",
+            "{{new_art_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get the deleted artwork",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{member_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/artworks/{{new_art_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "artworks",
+            "{{new_art_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Member create booking for different user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 403\", function () {\r\n    pm.response.to.have.status(403);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{member_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"userId\": 1,\r\n    \"time\": \"2026-08-22T14:30:00Z\",\r\n    \"notes\": \"Booked over the phone\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/bookings",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "bookings"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Member create booking",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is CREATED\", function () {\r\n pm.response.to.have.status(201);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains the newly created booking\", function () {\r\n var user = pm.response.json();\r\n pm.expect(user).to.have.property('id');\r\n pm.expect(user).to.have.property('userId');\r\n pm.expect(user).to.have.property('time');\r\n pm.expect(user).to.have.property('notes');\r\n});\r\n\r\npm.collectionVariables.set(\"new_art_booking\", pm.response.json().id);\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{member_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"userId\": {{new_member_id}},\r\n    \"time\": \"2026-08-22T14:30:00Z\",\r\n    \"notes\": \"Booked over the phone\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/bookings",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "bookings"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get users bookings",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"User has a single booking\", function () {\r\n    pm.expect(pm.response.json().length).to.equal(1);\r\n});\r\n\r\npm.test(\"Response body contains a JSON array\", function () {\r\n pm.expect(pm.response.json()).to.be.an('array');\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/bookings/user/{{new_member_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "bookings",
+            "user",
+            "{{new_member_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Staff delete booking",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is NO CONTENT\", function () {\r\n pm.response.to.have.status(204);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"userId\": {{new_member_id}},\r\n    \"time\": \"2026-08-22T14:30:00Z\",\r\n    \"notes\": \"Booked over the phone\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/bookings/{{new_art_booking}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "bookings",
+            "{{new_art_booking}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get users bookings after delete",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"User has a no bookings\", function () {\r\n    pm.expect(pm.response.json().length).to.equal(0);\r\n});\r\n\r\npm.test(\"Response body contains a JSON array\", function () {\r\n pm.expect(pm.response.json()).to.be.an('array');\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/bookings/user/{{new_member_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "bookings",
+            "user",
+            "{{new_member_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all bookings",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON array\", function () {\r\n pm.expect(pm.response.json()).to.be.an('array');\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/bookings/",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "bookings",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get future bookings",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON array\", function () {\r\n pm.expect(pm.response.json()).to.be.an('array');\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{staff_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/bookings/future",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "bookings",
+            "future"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all lands",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON array\", function () {\r\n pm.expect(pm.response.json()).to.be.an('array');\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{member_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/lands",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "lands"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add a land",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is CREATED\", function () {\r\n pm.response.to.have.status(201);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON object\", function () {\r\n pm.expect(pm.response.json()).to.be.an('object');\r\n});\r\n\r\npm.test(\"Response body contains the newly created artwork\", function () {\r\n var user = pm.response.json();\r\n pm.expect(user).to.have.property('id');\r\n pm.expect(user).to.have.property('name');\r\n pm.expect(user).to.have.property('description');\r\n pm.expect(user).to.have.property('polygon');\r\n});\r\n\r\npm.collectionVariables.set(\"new_land_id\", pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{curator_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n        \"name\": \"Test - Wow\",\r\n        \"description\": \"Example description\",\r\n        \"polygon\": {\r\n            \"type\": \"Polygon\",\r\n            \"coordinates\": [\r\n                [\r\n                    [\r\n                        144.6642348,\r\n                        -36.111583\r\n                    ],\r\n                    [\r\n                        145.7338195,\r\n                        -35.9828133\r\n                    ],\r\n                    [\r\n                        145.8214538,\r\n                        -36.2376871\r\n                    ],\r\n                    [\r\n                        144.6091504,\r\n                        -36.4547014\r\n                    ],\r\n                    [\r\n                        144.3813011,\r\n                        -35.9455403\r\n                    ],\r\n                    [\r\n                        144.6642348,\r\n                        -36.111583\r\n                    ]\r\n                ]\r\n            ]\r\n        }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/lands",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "lands"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete land",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is NO CONTENT\", function () {\r\n pm.response.to.have.status(204);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{curator_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/lands/{{new_land_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "lands",
+            "{{new_land_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Member as Admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is No content\", function () {\r\n pm.response.to.have.status(204);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users/{{new_member_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users",
+            "{{new_member_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Staff as Admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is No content\", function () {\r\n pm.response.to.have.status(204);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users/{{new_staff_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users",
+            "{{new_staff_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Curator as Admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is No content\", function () {\r\n pm.response.to.have.status(204);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users/{{new_curator_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users",
+            "{{new_curator_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Try to get the deleted member",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is Not Found\", function () {\r\n pm.response.to.have.status(404);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users/{{new_member_id}}",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users",
+            "{{new_member_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all users",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is OK\", function () {\r\n pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Response body is not empty\", function () {\r\n pm.response.to.have.jsonBody();\r\n pm.response.to.not.be.null;\r\n pm.response.to.not.be.undefined;\r\n});\r\n\r\npm.test(\"Response body contains a JSON array\", function () {\r\n pm.expect(pm.response.json()).to.be.an('array');\r\n});\r\n\r\npm.test(\"All users have correct feilds\", function(){\r\n    var users = pm.response.json();\r\n    var valid = users.every(user =>\r\n        user.hasOwnProperty(\"id\") &&\r\n        user.hasOwnProperty(\"email\") &&\r\n        user.hasOwnProperty(\"firstName\") &&\r\n        user.hasOwnProperty(\"lastName\") &&\r\n        user.hasOwnProperty(\"role\") &&\r\n        user.hasOwnProperty(\"createdDate\")\r\n    );\r\n    pm.expect(valid).to.be.true;\r\n});\r\n\r\npm.test(\"User count reflects the orginal count after all new users where deleted\", function () {\r\n    pm.expect(pm.response.json().length).to.equal(pm.collectionVariables.get(\"original_user_count\"));\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_auth_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://{{api_host}}:{{api_port}}/api/users",
+          "protocol": "http",
+          "host": [
+            "{{api_host}}"
+          ],
+          "port": "{{api_port}}",
+          "path": [
+            "api",
+            "users"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "api_host",
+      "value": "localhost"
+    },
+    {
+      "key": "api_port",
+      "value": "8000"
+    },
+    {
+      "key": "admin_email",
+      "value": "riley@rileybrownprojects.com"
+    },
+    {
+      "key": "admin_password",
+      "value": "RileyPassword"
+    },
+    {
+      "key": "new_member_email",
+      "value": "johnMember@example.com"
+    },
+    {
+      "key": "new_member_password",
+      "value": "johnPassword123"
+    },
+    {
+      "key": "new_curator_email",
+      "value": "lilly@art.com"
+    },
+    {
+      "key": "new_curator_password",
+      "value": "findingArt321"
+    },
+    {
+      "key": "new_staff_email",
+      "value": "martyn@booking.art.com"
+    },
+    {
+      "key": "new_staff_password",
+      "value": "bikes321"
+    },
+    {
+      "key": "updated_member_password",
+      "value": "myNewSecurePassword"
+    },
+    {
+      "key": "updated_art_name",
+      "value": "Artwork 2"
+    },
+    {
+      "key": "admin_auth_token",
+      "value": ""
+    },
+    {
+      "key": "new_member_id",
+      "value": ""
+    },
+    {
+      "key": "new_staff_id",
+      "value": ""
+    },
+    {
+      "key": "staff_auth_token",
+      "value": ""
+    },
+    {
+      "key": "new_curator_id",
+      "value": ""
+    },
+    {
+      "key": "member_auth_token",
+      "value": ""
+    },
+    {
+      "key": "original_user_count",
+      "value": ""
+    },
+    {
+      "key": "original_art_count",
+      "value": ""
+    },
+    {
+      "key": "curator_auth_token",
+      "value": ""
+    },
+    {
+      "key": "new_art_id",
+      "value": ""
+    },
+    {
+      "key": "new_art_booking",
+      "value": ""
+    },
+    {
+      "key": "new_land_id",
+      "value": ""
+    }
+  ]
+}
