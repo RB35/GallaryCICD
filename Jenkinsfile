@@ -90,5 +90,15 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Staging') {
+        steps {
+            dir('staging') {
+                bat """
+                    docker-compose -p gallery-staging up -d --wait
+                """
+            }
+        }
+}
     }
 }
