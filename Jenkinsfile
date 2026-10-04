@@ -25,6 +25,12 @@ pipeline {
             }
         }
 
+        stage("Quality gate") {
+            steps {
+                waitForQualityGate abortPipeline: true
+            }
+        }
+
         stage('Security') {
             steps {
                 dir('api') {
