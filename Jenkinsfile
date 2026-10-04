@@ -27,12 +27,7 @@ pipeline {
             steps {
                 dir('api') {
                     withSonarQubeEnv('SonarQube Cloud') {
-                        bat '''
-                            npx sonar-scanner \
-                            -Dsonar.organization=rb35 \
-                            -Dsonar.projectKey=RB35_GallaryCICD \
-                            -Dsonar.coverage.exclusions=**/*
-                        '''
+                        bat '''npx sonar-scanner -Dsonar.organization=rb35 -Dsonar.projectKey=RB35_GallaryCICD -Dsonar.coverage.exclusions=**/*'''
                     }
                 }
             }
@@ -65,11 +60,7 @@ pipeline {
             steps {
                 dir('testing') {
                     bat '''
-                    docker-compose -p "%COMPOSE_PROJECT_NAME%" -f docker-compose.test.yml up -d
-                    '''
-
-                    bat '''
-                    curl --fail --retry 15 --retry-delay 2 --retry-connrefused http://localhost:8000/api
+                    docker-compose -p "%COMPOSE_PROJECT_NAME%" -f docker-compose.test.yml up -d --wait
                     '''
                 }
             }
