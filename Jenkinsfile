@@ -71,12 +71,14 @@ pipeline {
                     powershell '''
                     Write-Host "Waiting for API container to become ready..."
 
-                    $maxAttempts = 30$attempt = 1
+                    $maxAttempts = 30
+                    $attempt = 1
 
-                    while ($attempt -le$maxAttempts) {
+                    while ($attempt -le $maxAttempts) {
                         try {
                             Write-Host "Health check attempt $attempt/$maxAttempts"
 
+                            # Bypass Jenkins proxy settings for localhost
                             $response = Invoke-WebRequest `
                                 -Uri "http://localhost:8000/api/health" `
                                 -UseBasicParsing `
@@ -99,13 +101,25 @@ pipeline {
                     Write-Error "API failed to become ready within 60 seconds."
 
                     Write-Host "Docker containers:"
-                    docker-compose -p $env:COMPOSE_PROJECT_NAME -f docker-compose.test.yml ps
+                    docker-compose `
+                        -p $env:COMPOSE_PROJECT_NAME `
+                        -f docker-compose.test.yml `
+                        ps
 
                     Write-Host "API logs:"
-                    docker-compose -p $env:COMPOSE_PROJECT_NAME -f docker-compose.test.yml logs api
+                    docker-compose `
+                        -p $env:COMPOSE_PROJECT_NAME `
+                        -f docker-compose.test.yml `
+                        logs api
+
+                    Write-Host "Postgres logs:"
+                    docker-compose `
+                        -p $env:COMPOSE_PROJECT_NAME `
+                        -f docker-compose.test.yml `
+                        logs postgres
 
                     exit 1
-                    '''
+                '''
                 }
             }
         }
