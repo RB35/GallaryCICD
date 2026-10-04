@@ -60,5 +60,32 @@ pipeline {
                 }
             }
         }
+
+        stage('Start Intergration Test Environment') {
+            steps {
+                dir("testing"){
+                sh """
+                    docker compose -p ${COMPOSE_PROJECT_NAME} \
+                        -f docker-compose.test.yml \
+                        up -d
+                """
+
+                // Wait until the API is ready
+                sh '''
+                    for i in $(seq 1 30); do
+                        if curl -f http://localhost:3000/api/health; then
+                            exit 0
+                        fi
+
+                        echo "Waiting for API..."
+                        sleep 2
+                    done
+
+                    echo "API failed to start"
+                    exit 1
+                '''
+                }
+            }
+        }
     }
 }

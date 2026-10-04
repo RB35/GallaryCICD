@@ -2,7 +2,7 @@ services:
   api:
     image: ${IMAGE}
     ports:
-      - "3000:3000"
+      - "8000:8000"
     environment:
       NODE_ENV: test
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/testdb
