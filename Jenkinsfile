@@ -79,7 +79,7 @@ pipeline {
                             Write-Host "Health check attempt $attempt/$maxAttempts"
 
                             $response = Invoke-WebRequest `
-                                -Uri "http://localhost:8000/api/" `
+                                -Uri "http://localhost:8000/api/health" `
                                 -UseBasicParsing `
                                 -TimeoutSec 2
 
