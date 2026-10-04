@@ -65,7 +65,7 @@ pipeline {
             steps {
                 dir('testing') {
                     bat '''
-                    docker compose -p "%COMPOSE_PROJECT_NAME%" -f docker-compose.test.yml up -d
+                    docker-compose -p "%COMPOSE_PROJECT_NAME%" -f docker-compose.test.yml up -d
                     '''
                 }
             }
