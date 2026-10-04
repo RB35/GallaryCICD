@@ -12,13 +12,17 @@ services:
         condition: service_healthy
 
   postgres:
-    image: postgres:16
+    image: postgis/postgis:16-3.4
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: testdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./dump.sql:/docker-entrypoint-initdb.d/01-init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d testdb"]
       interval: 2s
       timeout: 5s
       retries: 10
