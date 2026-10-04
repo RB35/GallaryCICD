@@ -33,7 +33,12 @@ pipeline {
 
         stage('Security') {
             steps {
+
                 dir('api') {
+                    echo 'Checking pnpm audit for known vulnerabilities...'
+                    bat 'pnpm audit --audit-level=moderate'c
+
+                    echo 'Running snyk code security scanner...'
                     snykSecurity(
                     snykInstallation: 'snyk@latest',
                     snykTokenId: 'snyk-api-token',
